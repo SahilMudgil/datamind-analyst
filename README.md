@@ -64,7 +64,17 @@ graph TD
 
 ## Quickstart: Running Locally
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: 1-Click Windows Launcher (Fastest)
+
+Simply double-click **`start_local.bat`** in the project root:
+- Automatically starts FastAPI backend (`http://localhost:8000`)
+- Automatically starts Vite React frontend (`http://localhost:3000`)
+- Opens `http://localhost:3000` in your default browser.
+- Direct connectivity to local **MySQL (`localhost:3306`)** and **PostgreSQL (`localhost:5432` / `5433`)**.
+
+---
+
+### Option 2: Docker Compose (All Platforms)
 
 Start the App Database (PostgreSQL + pgvector), Backend, and Frontend in one command:
 
