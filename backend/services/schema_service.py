@@ -84,14 +84,19 @@ class SchemaService:
         port = int(conn.port) if conn.port else (3306 if conn.db_type == "mysql" else 5432)
         db_name = conn.db_name or "postgres"
 
-        driver = "mysql+pymysql" if conn.db_type == "mysql" else "postgresql"
+        query_params = {}
+        if conn.db_type == "postgresql" and host not in ("localhost", "127.0.0.1"):
+            query_params["sslmode"] = "require"
+
+        driver = "mysql+pymysql" if conn.db_type == "mysql" else "postgresql+psycopg"
         url_obj = URL.create(
             drivername=driver,
             username=user,
             password=password,
             host=host,
             port=port,
-            database=db_name
+            database=db_name,
+            query=query_params
         )
         return url_obj.render_as_string(hide_password=False)
 
@@ -108,14 +113,18 @@ class SchemaService:
         if db_type == "sqlite":
             url_obj = URL.create(drivername="sqlite", database=db_name)
         elif db_type in ("postgresql", "mysql"):
-            driver = "mysql+pymysql" if db_type == "mysql" else "postgresql"
+            driver = "mysql+pymysql" if db_type == "mysql" else "postgresql+psycopg"
+            query_params = {}
+            if db_type == "postgresql" and host not in ("localhost", "127.0.0.1"):
+                query_params["sslmode"] = "require"
             url_obj = URL.create(
                 drivername=driver,
                 username=username,
                 password=password,
                 host=host,
                 port=int(port) if port else (3306 if db_type == "mysql" else 5432),
-                database=db_name
+                database=db_name,
+                query=query_params
             )
         else:
             return {"success": False, "error": f"Unsupported database type: {db_type}"}
