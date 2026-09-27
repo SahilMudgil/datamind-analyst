@@ -1,18 +1,33 @@
 import React, { useState } from 'react';
-import { Database, ShieldCheck, CheckCircle2, AlertCircle, X, Loader2 } from 'lucide-react';
+import { Database, ShieldCheck, CheckCircle2, AlertCircle, X, Loader2, Sparkles, RefreshCw } from 'lucide-react';
 import { api } from '../services/api';
 
-export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCreated }) {
-  const [formData, setFormData] = useState({
-    display_name: 'E-commerce Sandbox',
-    host: 'localhost',
-    port: 5433,
-    db_name: 'ecommerce_db',
-    username: 'readonly_agent',
-    password: 'readonly_secure_pass',
-    db_type: 'postgresql'
-  });
+const isCloud = typeof window !== 'undefined' && 
+  !window.location.hostname.includes('localhost') && 
+  !window.location.hostname.includes('127.0.0.1');
 
+const DEMO_CLOUD_CONFIG = {
+  display_name: 'E-commerce Cloud Store (PostgreSQL)',
+  host: 'ep-small-darkness-b4sn8qbx.c-6.us-east-2.aws.neon.tech',
+  port: 5432,
+  db_name: 'neondb',
+  username: 'neondb_owner',
+  password: 'npg_vxaIl9DM8tYy',
+  db_type: 'postgresql'
+};
+
+const LOCAL_SANDBOX_CONFIG = {
+  display_name: 'E-commerce Sandbox (Local)',
+  host: 'localhost',
+  port: 5433,
+  db_name: 'ecommerce_db',
+  username: 'readonly_agent',
+  password: 'readonly_secure_pass',
+  db_type: 'postgresql'
+};
+
+export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCreated }) {
+  const [formData, setFormData] = useState(isCloud ? DEMO_CLOUD_CONFIG : LOCAL_SANDBOX_CONFIG);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -30,7 +45,31 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
     setError('');
   };
 
+  const handleFillDemo = () => {
+    setFormData(DEMO_CLOUD_CONFIG);
+    setTestResult(null);
+    setError('');
+  };
+
+  const handleClear = () => {
+    setFormData({
+      display_name: '',
+      host: '',
+      port: 5432,
+      db_name: '',
+      username: '',
+      password: '',
+      db_type: 'postgresql'
+    });
+    setTestResult(null);
+    setError('');
+  };
+
   const handleTestConnection = async () => {
+    if (isCloud && (formData.host === 'localhost' || formData.host === '127.0.0.1')) {
+      setError('Notice: "localhost" points to your personal PC. Since you are using the live cloud website, please click "Load Cloud Demo DB" above to test our live sample database, or enter your remote cloud database host (AWS RDS, Neon, Supabase, Aiven).');
+      return;
+    }
     setTesting(true);
     setTestResult(null);
     setError('');
@@ -53,6 +92,10 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isCloud && (formData.host === 'localhost' || formData.host === '127.0.0.1')) {
+      setError('Notice: "localhost" points to your personal PC. Since you are using the live cloud website, please click "Load Cloud Demo DB" above or enter a cloud database host.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -84,7 +127,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
       padding: '20px'
     }}>
       <div className="glass-panel" style={{
-        maxWidth: '520px',
+        maxWidth: '540px',
         width: '100%',
         maxHeight: '90vh',
         overflowY: 'auto',
@@ -109,7 +152,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
         </button>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <div style={{
             width: '42px',
             height: '42px',
@@ -124,24 +167,67 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '800' }}>Connect Database</h2>
             <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>
-              Provide credentials for your target relational database
+              Connect a PostgreSQL or MySQL relational database for AI analytics
             </p>
           </div>
         </div>
+
+        {/* 1-Click Demo DB Banner for Cloud Mode */}
+        {isCloud && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.12))',
+            border: '1px solid rgba(139, 92, 246, 0.35)',
+            borderRadius: 'var(--radius-md)',
+            padding: '12px 14px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '10px'
+          }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                <Sparkles size={16} color="#c084fc" />
+                <span style={{ fontSize: '0.84rem', fontWeight: '700', color: '#e9d5ff' }}>
+                  1-Click Sample Cloud Database
+                </span>
+              </div>
+              <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.35 }}>
+                Testing the live demo? Pre-fill our 5-table E-Commerce PostgreSQL database with one click.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleFillDemo}
+              className="btn btn-secondary"
+              style={{
+                padding: '6px 12px',
+                fontSize: '0.78rem',
+                whiteSpace: 'nowrap',
+                background: 'rgba(139, 92, 246, 0.25)',
+                border: '1px solid rgba(168, 85, 247, 0.5)',
+                color: '#ffffff',
+                cursor: 'pointer'
+              }}
+            >
+              Fill Demo DB
+            </button>
+          </div>
+        )}
 
         {/* Security Notice */}
         <div style={{
           background: 'rgba(16, 185, 129, 0.08)',
           border: '1px solid rgba(16, 185, 129, 0.25)',
           borderRadius: 'var(--radius-md)',
-          padding: '12px',
-          marginBottom: '20px',
+          padding: '10px 12px',
+          marginBottom: '16px',
           display: 'flex',
           gap: '10px'
         }}>
-          <ShieldCheck size={20} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ fontSize: '0.78rem', color: '#a7f3d0', lineHeight: 1.4 }}>
-            <strong>Security Guardrail:</strong> Use a dedicated read-only database role. Destructive queries (DROP, INSERT, UPDATE) are AST-blocked.
+          <ShieldCheck size={18} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <div style={{ fontSize: '0.76rem', color: '#a7f3d0', lineHeight: 1.35 }}>
+            <strong>Security Guardrail:</strong> Dedicated read-only role recommended. Destructive queries (DROP, INSERT, UPDATE, DELETE) are AST-blocked automatically.
           </div>
         </div>
 
@@ -152,8 +238,9 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
             padding: '12px',
             borderRadius: 'var(--radius-md)',
             color: '#fca5a5',
-            fontSize: '0.825rem',
-            marginBottom: '16px'
+            fontSize: '0.8rem',
+            marginBottom: '16px',
+            lineHeight: 1.4
           }}>
             {error}
           </div>
@@ -173,7 +260,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
             gap: '8px'
           }}>
             <CheckCircle2 size={16} color="#10b981" />
-            <span>Connection verified! Found {testResult.tables_found} tables ({testResult.tables?.slice(0, 3).join(', ')}...)</span>
+            <span>Connection verified successfully! Ready to introspect schema.</span>
           </div>
         )}
 
@@ -210,7 +297,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
                 className="input-field"
                 value={formData.display_name}
                 onChange={handleChange}
-                placeholder="e.g. Sales Production DB"
+                placeholder="e.g. Sales Database"
                 required
               />
             </div>
@@ -225,7 +312,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
                 className="input-field"
                 value={formData.host}
                 onChange={handleChange}
-                placeholder="localhost"
+                placeholder={isCloud ? "e.g. ep-xyz.aws.neon.tech or aws-rds.com" : "localhost"}
                 required
               />
             </div>
@@ -243,7 +330,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
             </div>
           </div>
 
-          {typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1') && (formData.host === 'localhost' || formData.host === '127.0.0.1') && (
+          {isCloud && (formData.host === 'localhost' || formData.host === '127.0.0.1') && (
             <div style={{
               fontSize: '0.75rem',
               color: '#93c5fd',
@@ -254,13 +341,13 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
               borderRadius: 'var(--radius-md)',
               lineHeight: 1.4
             }}>
-              💡 <strong>Connecting a local PC database (MySQL / Postgres)?</strong><br />
+              💡 <strong>Want to connect a local PC database (MySQL / Postgres)?</strong><br />
               • To connect <code>localhost</code> directly, run DataMind locally on your PC (double-click <code>start_local.bat</code> and open <code>http://localhost:3000</code>).<br />
-              • To connect from this cloud website, enter your cloud database host (AWS RDS, Neon, Supabase, Aiven MySQL) or a tunnel address.
+              • Or click <strong>Fill Demo DB</strong> above to test our live sample database right now!
             </div>
           )}
 
-          {typeof window !== 'undefined' && (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1')) && (
+          {!isCloud && (
             <div style={{
               fontSize: '0.75rem',
               color: '#6ee7b7',
@@ -279,7 +366,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
               className="input-field"
               value={formData.db_name}
               onChange={handleChange}
-              placeholder="ecommerce_db"
+              placeholder="e.g. neondb or ecommerce_db"
               required
             />
           </div>
@@ -293,7 +380,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
                 className="input-field"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="readonly_agent"
+                placeholder="e.g. postgres or root"
                 required
               />
             </div>
@@ -311,7 +398,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
             <button
               type="button"
               className="btn btn-secondary"
@@ -327,7 +414,7 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
               disabled={saving}
               style={{ flex: 1 }}
             >
-              {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save & Introspect'}
+              {saving ? <><Loader2 size={16} className="animate-spin" /> Saving & Introspecting...</> : 'Save & Introspect'}
             </button>
           </div>
         </form>
