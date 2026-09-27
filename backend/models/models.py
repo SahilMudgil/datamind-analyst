@@ -121,7 +121,7 @@ class Message(Base):
     final_sql = Column(Text, nullable=True)
     query_result = Column(JSONB, nullable=True)
     analysis_result = Column(JSONB, nullable=True) # trend %, outliers, correlation notes
-    chart_type = Column(String(20), nullable=True) # 'bar' | 'line' | 'pie' | 'stat_card'
+    chart_type = Column(String(50), nullable=True) # 'bar' | 'line' | 'pie' | 'stat_card'
     chart_config = Column(JSONB, nullable=True)
     was_successful = Column(Boolean, default=True)
     total_latency_ms = Column(Integer, nullable=True)
@@ -180,7 +180,7 @@ class DashboardWidget(Base):
     connection_id = Column(Integer, ForeignKey("database_connections.id", ondelete="CASCADE"), nullable=False)
     title = Column(String(200), nullable=False)
     sql_query = Column(Text, nullable=False)
-    chart_type = Column(String(20), nullable=False)
+    chart_type = Column(String(50), nullable=False)
     chart_config = Column(JSONB, nullable=True)
     position_x = Column(Integer, default=0)
     position_y = Column(Integer, default=0)
@@ -218,7 +218,7 @@ class LLMUsageLog(Base):
     message_id = Column(Integer, ForeignKey("messages.id", ondelete="SET NULL"), nullable=True)
     provider = Column(String(20), nullable=False) # 'gemini' | 'groq'
     model_used = Column(String(50), nullable=False)
-    step_type = Column(String(30), nullable=False)
+    step_type = Column(String(255), nullable=False)
     input_tokens = Column(Integer, default=0)
     output_tokens = Column(Integer, default=0)
     estimated_cost_usd = Column(Numeric(10, 6), default=0.0)
