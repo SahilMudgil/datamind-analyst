@@ -1,0 +1,60 @@
+
+services:
+  app_db:
+    image: pgvector/pgvector:pg16
+    container_name: text_to_sql_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+    ports:
+      - "5433:5432" # Mapped to 5433 to avoid collision with existing local PostgreSQL on 5432
+    volumes:
+      - app_db_data:/var/lib/postgresql/data
+      - ./sample_data/init-dbs.sql:/docker-entrypoint-initdb.d/01-init-dbs.sql
+      - ./sample_data/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: text_to_sql_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://app_user:app_password@app_db:5432/app_db
+      - TARGET_DB_URL=postgresql://readonly_agent:readonly_secure_pass@app_db:5432/ecommerce_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      app_db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: text_to_sql_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  app_db_data:

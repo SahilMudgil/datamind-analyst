@@ -1,0 +1,15 @@
+transaction_id,customer_name,city,product_name,category,units_sold,unit_price,total_revenue,transaction_date
+TXN_1001,Aarav Sharma,Mumbai,Ultra HD 4K Smart TV 55",Electronics,1,44999.00,44999.00,2023-01-15
+TXN_1002,Priya Patel,Mumbai,Noise-Cancelling Wireless Headphones,Electronics,2,7999.00,15998.00,2023-02-18
+TXN_1003,Rohan Verma,Delhi,Mechanical Gaming Keyboard RGB,Electronics,1,4599.00,4599.00,2023-02-20
+TXN_1004,Ananya Iyer,Bangalore,Ergonomic Mesh Office Chair,Home & Furniture,1,11499.00,11499.00,2023-03-05
+TXN_1005,Vikram Singh,Jaipur,Solid Wood Study Desk,Home & Furniture,1,8999.00,8999.00,2023-03-18
+TXN_1006,Sneha Kulkarni,Pune,Women Handcrafted Silk Kurta,Apparel,2,2499.00,4998.00,2023-04-02
+TXN_1007,Aditya Nair,Kochi,Fitness Smartwatch with Heart Rate Monitor,Fitness & Wearables,1,3999.00,3999.00,2023-04-15
+TXN_1008,Neha Gupta,Mumbai,Ultra HD 4K Smart TV 55",Electronics,1,44999.00,44999.00,2023-05-12
+TXN_1009,Rahul Roy,Kolkata,Stainless Steel Chef Knife Set,Kitchen & Dining,2,2199.00,4398.00,2023-06-01
+TXN_1010,Divya Menon,Bangalore,Automatic Espresso Coffee Machine,Kitchen & Dining,1,18999.00,18999.00,2023-06-25
+TXN_1011,Karan Malhotra,Delhi,Noise-Cancelling Wireless Headphones,Electronics,1,7999.00,7999.00,2023-07-04
+TXN_1012,Manish Chawla,Mumbai,Men Cotton Slim Fit Formal Shirt,Apparel,1,1499.00,1499.00,2023-08-01
+TXN_1013,Tanvi Deshmukh,Pune,Adjustable Cast Iron Dumbbell Set 20kg,Fitness & Wearables,1,4999.00,4999.00,2023-09-10
+TXN_1014,Siddharth Joshi,Ahmedabad,Python Data Analysis & ML Handbook,Books,2,899.00,1798.00,2023-10-05
