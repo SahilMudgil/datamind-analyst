@@ -237,11 +237,39 @@ export default function ConnectDatabaseModal({ isOpen, onClose, onConnectionCrea
                 className="input-field"
                 value={formData.port}
                 onChange={handleChange}
-                placeholder="5432"
+                placeholder={formData.db_type === 'mysql' ? '3306' : '5432'}
                 required
               />
             </div>
           </div>
+
+          {typeof window !== 'undefined' && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1') && (formData.host === 'localhost' || formData.host === '127.0.0.1') && (
+            <div style={{
+              fontSize: '0.75rem',
+              color: '#93c5fd',
+              marginBottom: '14px',
+              background: 'rgba(59, 130, 246, 0.08)',
+              border: '1px solid rgba(59, 130, 246, 0.25)',
+              padding: '8px 12px',
+              borderRadius: 'var(--radius-md)',
+              lineHeight: 1.4
+            }}>
+              💡 <strong>Connecting a local PC database (MySQL / Postgres)?</strong><br />
+              • To connect <code>localhost</code> directly, run DataMind locally on your PC (double-click <code>start_local.bat</code> and open <code>http://localhost:3000</code>).<br />
+              • To connect from this cloud website, enter your cloud database host (AWS RDS, Neon, Supabase, Aiven MySQL) or a tunnel address.
+            </div>
+          )}
+
+          {typeof window !== 'undefined' && (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1')) && (
+            <div style={{
+              fontSize: '0.75rem',
+              color: '#6ee7b7',
+              marginBottom: '14px',
+              lineHeight: 1.4
+            }}>
+              ⚡ <strong>Local mode active:</strong> You can connect directly to your local PC's MySQL (<code>localhost:3306</code>) or PostgreSQL (<code>localhost:5432 / 5433</code>).
+            </div>
+          )}
 
           <div className="input-group">
             <label className="input-label">Database Name</label>
